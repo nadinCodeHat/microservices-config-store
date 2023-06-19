@@ -1,0 +1,48 @@
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
+          gateway.route.RouteDefinitionLocator: INFO
+    root: INFO
+server:
+  port: 8081
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        -   id: config-service
+            predicates:
+              - Path=/api/v1/configs/**
+            uri: lb://config-service
+        -   id: customer-service
+            predicates:
+              - Path=/api/v1/customers/**
+            uri: lb://customer-service
+        -   id: booking-service
+            predicates:
+              - Path=/api/v1/bookings/**
+            uri: lb://booking-service
+        -   id: notification-service
+            predicates:
+              - Path=/api/v1/notifications/**
+            uri: lb://notification-service
+        -   id: discovery-service
+            predicates:
+              - Path=/eureka/web
+            uri: http://localhost:8761
+            filters:
+              - SetPath=/
+        -   id: discovery-service-static
+            predicates:
+              - Path=/eureka/**
+            uri: http://localhost:8761
